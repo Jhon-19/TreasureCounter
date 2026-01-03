@@ -1,5 +1,5 @@
 {
-  "name": "electron-app",
+  "name": "treasure-clock",
   "version": "1.0.0",
   "description": "财富时钟⏰",
   "main": "./out/main/index.js",
