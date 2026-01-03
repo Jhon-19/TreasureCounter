@@ -62,5 +62,12 @@ export const getFixTop = () => {
 }
 
 export const getAppConfig = () => {
-  return store.store
+  const originValues =  store.store
+  let values = {salary: 10000,
+      workdays: 20,
+      fixTop: false,}
+  if (typeof originValues === 'object') {
+    values = Object.assign({}, values, originValues)
+  }
+  return values
 }
