@@ -1,60 +1,19 @@
-import { app, shell, BrowserWindow, Menu } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import { app } from 'electron'
+import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { registerApis } from './api'
-import { UPDATE_COUNTER } from '../constants/api'
+import { createTrayWindow } from './frames/tray-window'
+import { createTray } from './frames/tray'
+import { computeSalaryInTime } from './utils/salary'
 
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
+// 确保应用单实例运行
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+}
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  // 主进程向渲染进程通信
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'app',
-      submenu: [
-        {
-          click: () => {
-            mainWindow.webContents.send(UPDATE_COUNTER, 1)
-          },
-          label: '+1'
-        },
-        {
-          click: () => mainWindow.webContents.send(UPDATE_COUNTER, -1),
-          label: '-1'
-        }
-      ]
-    }
-  ])
-  Menu.setApplicationMenu(menu)
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+// 隐藏默认的应用程序坞图标（macOS特有）
+if (process.platform === 'darwin') {
+  app.dock.hide()
 }
 
 // This method will be called when Electron has finished
@@ -71,15 +30,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  createTray()
+  const trayWindow = createTrayWindow()
+
   registerApis()
-
-  createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+  computeSalaryInTime(trayWindow)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -90,6 +45,3 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

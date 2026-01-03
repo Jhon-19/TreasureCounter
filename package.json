@@ -1,7 +1,7 @@
 {
   "name": "electron-app",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "财富时钟⏰",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
@@ -23,7 +23,15 @@
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
     "antd": "^6.1.3",
-    "electron-updater": "^6.3.9"
+    "dayjs": "^1.11.19",
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.3.9",
+    "holiday-calendar": "^1.3.0",
+    "react-countup": "^6.5.3",
+    "react-router": "^7.11.0",
+    "react-router-dom": "^7.11.0",
+    "timezone": "^1.0.23",
+    "utc": "^0.1.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
