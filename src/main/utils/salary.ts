@@ -49,7 +49,7 @@ const initCurrentSalary = async (trayWindow: BrowserWindow) => {
 
 const updateSalary = async (trayWindow: BrowserWindow) => {
   const isHolidayToday = await checkTodayIsHoliday()
-  if (!isHolidayToday) {
+  if (isHolidayToday) {
     currentSalary += salaryPerSecond
     trayWindow.webContents.send(UPDATE_SALARY, currentSalary)
     setTrayTooltip(`本月收入¥：${currentSalary.toFixed(6)}`)
